@@ -1,0 +1,249 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2452db5c-d87d-44d8-ba97-b6721bde1778",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "098a4c0e-a10e-4f5e-a560-bfce1ed93f1c",
+      "name": "Webhook",
+      "webhookId": "2452db5c-d87d-44d8-ba97-b6721bde1778"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b955fed-8f02-4a8e-92cb-3f928ed6ea5a",
+              "name": "text",
+              "value": "={{$json.body.text}}",
+              "type": "string"
+            },
+            {
+              "id": "82e5c59d-2b7e-4d7c-9ad2-71332ed1ec67",
+              "name": "length",
+              "value": "={{$json.body.text.length}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "50a36800-54a4-4ed4-854b-9257534f7ed7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a084e019-9814-4570-9a2f-db75fa6806c5",
+              "leftValue": "={{$json.text.length}}\n\n",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "fe8e9993-6984-467f-bbc6-d695f47c5bb5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "1838887190",
+        "text": "={{$json.text}}\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        224
+      ],
+      "id": "f8bbf153-d5f2-47ce-a3be-4843b75d965f",
+      "name": "Send a text message",
+      "webhookId": "d225cac0-75e1-48b0-86f9-d974fcd91723",
+      "credentials": {
+        "telegramApi": {
+          "id": "wykR6pZrVkAb3TF8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "1838887190",
+        "text": "={{$json[\"output\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1056,
+        -96
+      ],
+      "id": "fa8c8e89-9573-4bbb-8c45-96204f367b46",
+      "name": "Send a text message1",
+      "webhookId": "9f05d79f-ec89-4bf0-89b7-8f984d7ef8ec",
+      "credentials": {
+        "telegramApi": {
+          "id": "wykR6pZrVkAb3TF8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Сделай краткое описание следующего текста: {{ $json.text }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "7b9fbbcb-02e3-44f3-ad07-bed96faaebc3",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt://b1g3bilebg9mp7j1jfe6/yandexgpt-lite/latest",
+          "mode": "list",
+          "cachedResultName": "gpt://b1g3bilebg9mp7j1jfe6/yandexgpt-lite/latest"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        80
+      ],
+      "id": "447f8cd7-7f3e-4ce9-ba08-249bb92d2089",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YQ8n3H0e8HZtEjt2",
+          "name": "YandexGPT"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "63fe50dc-9f4c-4aa6-92b2-56ca90e38a7f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a75cebd05f4e241a1c652a2f2f3245c4fb712e79994d649048790ad16e139959"
+  },
+  "id": "i87nU5jHtrvuqekCCGBgh",
+  "tags": []
+}
